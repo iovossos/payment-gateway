@@ -1,0 +1,74 @@
+spring:
+  application:
+    name: payment-gateway
+
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payment_gateway
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  # Redis Configuration
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 2000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+
+  # Flyway Configuration
+  flyway:
+    locations: classpath:db.migration
+    baseline-on-migrate: true
+
+  # Security Configuration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/auth/realms/payment-gateway
+
+# Application Configuration
+app:
+  security:
+    jwt:
+      secret: mySecretKey
+      expiration: 86400000 # 24 hours
+  payment:
+    fraud-detection:
+      enabled: true
+      threshold: 1000.00
+    rate-limiting:
+      requests-per-minute: 100
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.paymentgateway: DEBUG
+    org.springframework.security: DEBUG
